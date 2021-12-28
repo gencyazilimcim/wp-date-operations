@@ -1,4 +1,5 @@
-public $str;
+class v_day_counter {
+	public $str;
 	
 	public function __construct(){
 		add_shortcode( 'v_day', array($this, 'salcodes_cta') );
