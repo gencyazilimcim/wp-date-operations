@@ -1,18 +1,19 @@
+<?php 
+
+
 class v_day_counter {
 	public $str;
 	
 	public function __construct(){
-		add_shortcode( 'v_day', array($this, 'salcodes_cta') );
+		add_shortcode( 'v_day', array($this, 'v_date_cta') );
 	}
 	public function v_date_grab($str){
-	  // regex pattern will match any date formatted dd-mm-yyy or d-mm-yyyy with
-	  // separators: periods, slahes, dashes
-	  $c_pattern = '{.*?(\d\d?)[\\/\.\-]([\d]{2})[\\/\.\-]([\d]{4}).*}';
-	  $date = preg_replace($c_pattern, '$3-$2-$1', $str);
-	  return new DateTime($date);
+	  $rep_arg = ['.','/'];
+	  $vdate = str_replace($rep_arg, "-", $str);
+	  return $vdate;
 	}
 	
-	public function salcodes_cta($atts){
+	public function v_date_cta($atts){
 		ob_start();
 		//countown
 		$a = shortcode_atts( array(
@@ -25,7 +26,9 @@ class v_day_counter {
 		$no_whitespaces = trim($a['param']); //no spaces
 
 		$no_whitespaces = preg_replace( '/\s*,\s*/', ',', filter_var($no_whitespaces, FILTER_SANITIZE_STRING ) );  // only numeric and string
-		$no_whitespaces = preg_replace('/\s+/', '', $no_whitespaces); // space removed 
+		
+		preg_match_all("/[a-zA-Z0-9\/|,_.\-=:]+/", $no_whitespaces, $vmatches); //Permit only certain letters, numbers and characters in a string -> ,.: _-= /|
+		$no_whitespaces = implode(" ",$vmatches[0]);
 
 		$no_whitespaces = strtolower($no_whitespaces); //string to lower
 
@@ -49,25 +52,26 @@ class v_day_counter {
 		 * 12-30-2021 23:30
 		 * */
 		$patterns = array(
-		    'Y'           =>'/^[0-9]{4}$/',
-		    'Y-m'         =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])$/',
-		    'Y-m-d'       =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])$/',
-				'Y-m-d H'     =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\s(0|[0-1][0-9]|2[0-4])$/',
-		    'Y-m-d H:i'   =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
+            'Y'           =>'/^[0-9]{4}$/',
+            'Y-m'         =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])$/',
+            'Y-m-d'       =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])$/',
+			'Y-m-d H'     =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\s(0|[0-1][0-9]|2[0-4])$/',
+            'Y-m-d H:i'   =>'/^[0-9]{4}(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
 
-		    'm-Y'         =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}$/',
-		    'd-m-Y'       =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}$/',
-		    'd-m-Y H'     =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4])$/',
-		    'd-m-Y H:i'   =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
-
-				'm-d-Y'       =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}$/',
-		    'm-d-Y H'     =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4])$/',
-		    'm-d-Y H:i'   =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
-		);
+            'm-Y'         =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}$/',
+            'd-m-Y'       =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}$/',
+            'd-m-Y H'     =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4])$/',
+            'd-m-Y H:i'   =>'/^([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)([1-9]|0[1-9]|1[0-2])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
+			
+			'm-d-Y'       =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}$/',
+            'm-d-Y H'     =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4])$/',
+            'm-d-Y H:i'   =>'/^([1-9]|0[1-9]|1[0-2])(-|\/)([1-9]|0[1-9]|[1-2][0-9]|3[0-1])(-|\/)[0-9]{4}\s(0|[0-1][0-9]|2[0-4]):?(0|[0-5][0-9]|60)$/',
+        );
 
 		
 		if(count($param_array) <= 2){
 			if($param_array[0] == "this_current"){
+				$param_array[1] = preg_replace('/\s+/', '', $param_array[1]); // space removed 
 				sanitize_text_field($param_array[1]);
 				$param_array[1] = preg_replace('/[^a-z.!?]/', '', $param_array[1]);
 				switch ($param_array[1]) {
@@ -92,13 +96,14 @@ class v_day_counter {
 
 			}elseif($param_array[0] == "later_day"){
 				if(is_numeric($param_array[1])){
+					$param_array[1] = preg_replace('/\s+/', '', $param_array[1]); // space removed 
 					$param_array[1] =  preg_replace("/\D+/", "", $param_array[1]);
 					echo $param_array[1]." gün sonra";	
 				}else{
 					echo "later_dat hata yaptınız.";
 				}
 			}elseif($param_array[0] == "countdown") {
-
+				
 				if( preg_match($patterns['Y'], $param_array[1]) ){
 					echo "yıl tarih formatı doğru<br>";
 					echo date("m-d-Y", strtotime("31-12-".$param_array[1]));
@@ -120,24 +125,9 @@ class v_day_counter {
 
 				echo "<br>countdown sayacı => ". $param_array[1];
 			}elseif($param_array[0] == "s_countdown") {
-
-				/*if( preg_match($patterns['Y'], $param_array[1]) ){
-					echo "[simple] => yıl tarih formatı doğru -> [Y]";
-				}elseif(preg_match($patterns['Y-m'], $param_array[1])){
-					echo "[simple] => yıl ve ay tarih formatı doğru -> [Y-m]";
-				}elseif(preg_match($patterns['m-Y'], $param_array[1])){
-					echo "[simple] =>  ay ve yıl tarih formatı doğru -> [m-Y]";
-				}elseif(preg_match($patterns['Y-m-d'], $param_array[1])){
-					echo "[simple] => yıl ve ay ve gün tarih formatı doğru -> [Y-m-d]";
-				}elseif(preg_match($patterns['Y-m-d H'], $param_array[1])){
-					echo "[simple] => yıl ve ay ve gün ve saat tarih formatı doğru -> [Y-m-d H]";
-				}elseif(preg_match($patterns['Y-m-d H:i'], $param_array[1])){
-					echo "[simple] => yıl ve ay ve gün ve saat ve dakika tarih formatı doğru -> [Y-m-d H:i]";
-				}else{
-					echo "[simple] => tarih formatı yanlış";
-				}*/
-				$n_date = self::v_date_grab( $param_array[1] );
-				echo $param_date = $n_date->format('Y-m-d');
+				
+				$param_array[1] = $this->v_date_grab( $param_array[1] );
+				
 
 				foreach($patterns as $v_format => $fval){
 
@@ -149,6 +139,7 @@ class v_day_counter {
 
 				echo "<br>[simple] => countdown sayacı => ". $param_array[1];
 			}elseif($param_array[0] == "count_message") {
+				$param_array[1] = preg_replace('/\s+/', '', $param_array[1]); // space removed 
 				$a['message'] = esc_js($a['message']);
 				if(is_numeric($param_array[1]) &&  isset($a['message'])){
 					$param_array[1] =  preg_replace("/\D+/", "", $param_array[1]);
@@ -180,11 +171,10 @@ class v_day_counter {
 		}else{
 			echo "<br>array count hata";
 		}
-		
+				
 		return $output;
 		ob_get_clean();
 	}
 }
-
 
 new v_day_counter();
