@@ -8,7 +8,7 @@ class v_day_counter {
 		add_shortcode( 'v_day', array($this, 'v_date_cta') );
 	}
 	public function v_date_grab($str){
-	  /* date seperator convert*/
+	  /* date format convert*/
 	  $rep_arg = ['.','/'];
 	  $vdate = str_replace($rep_arg, "-", $str);
 	  return $vdate;
