@@ -179,3 +179,5 @@ class v_day_counter {
 }
 
 new v_day_counter();
+
+echo "mini yazılımcı";
